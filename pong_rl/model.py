@@ -80,6 +80,7 @@ def calculate_loss(
     assert params_device == states.device, f"{params_device=}, {states.device=}, {device=}"
     q_values = net(states)  # all actions
     q_values_chosen = q_values.gather(1, actions.unsqueeze(-1))  # only of actions we chose
+    q_values_chosen = q_values_chosen.squeeze(-1)
 
     # compute q-values of next states
     with torch.no_grad():

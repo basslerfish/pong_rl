@@ -91,6 +91,7 @@ def main() -> None:
     frame_idx = 0
     last_time = time.time()
     log_dir = base_log_dir / f"{time.time():.0f}"
+    print(f"Tensorboard output: {log_dir}")
     writer = SummaryWriter(log_dir=str(log_dir))
     last_loss = np.nan
     has_started = False
@@ -131,6 +132,7 @@ def main() -> None:
 
             # save model
             if (best_m_reward is None) or (m_reward > best_m_reward):
+                print(f"New best reward: {best_m_reward:.3f}")
                 save_path = save_dir / f"best_{m_reward:.0f}.dat"
                 torch.save(net.state_dict(), str(save_path))
                 best_m_reward = m_reward
