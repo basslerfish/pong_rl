@@ -21,7 +21,7 @@ module load cuDNN/9.5.0.50-CUDA-12.6.0
 
 #install packages
 echo "---INSTALLING PACKAGES---"
-pip install --user gymnasium[all] stable-baselines[extra]
+pip install --user gymnasium[all] stable-baselines[extra] ale_py
 pip install --user -e "$HOME"/github/pong_rl
 
 #Run very simple script
