@@ -76,8 +76,8 @@ def calculate_loss(
     next_states = tensors[4]
 
     # compute q-values of states
-    print(f"Params device: {next(net.parameters()).device}, states device: {states.device}")
-    assert next(net.parameters()).device == states.device
+    states.to(device)
+    assert next(net.parameters()).device == states.device, f"{device=}"
     q_values = net(states)  # all actions
     q_values_chosen = q_values.gather(1, actions.unsqueeze(-1))  # only of actions we chose
 

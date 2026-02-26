@@ -78,5 +78,7 @@ def batch_to_tensors(batch: list[Experience], device: torch.device) -> BatchTens
 
     all_tensors = (states, actions, rewards, dones, new_states)
     for tensor in all_tensors:
+        print(f"Before: {tensor.device}")
         tensor.to(device)
+        print(f"After: {tensor.device}")
     return all_tensors
