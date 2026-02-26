@@ -1,6 +1,6 @@
 """
 Use a pre-trained DQN to play pong.
-Requires path to weights file as input argument.
+--file: Can use path to weights file as input argument.
 """
 import argparse
 from pathlib import Path
@@ -20,8 +20,9 @@ ENV_NAME = "PongNoFrameskip-v4"
 
 def main() -> None:
     # argument parsing
+    default_file = Path.cwd().parent / "data" / "best_weights.dat"
     parser = argparse.ArgumentParser()
-    parser.add_argument("--file", help="Path to model weights file.")
+    parser.add_argument("--file", help="Path to model weights file.", default=str(default_file))
     args = parser.parse_args()
 
     # load environment
@@ -33,7 +34,7 @@ def main() -> None:
     # load weights
     weights_file = Path(args.file)
     assert weights_file.is_file(), f"Weights file {weights_file} does not exist."
-    state_dict = torch.load(str(weights_file))
+    state_dict = torch.load(str(weights_file), map_location=torch.device("cpu"))
     net.load_state_dict(state_dict)
 
     # prep agent
