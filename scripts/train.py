@@ -58,6 +58,8 @@ def main() -> None:
 
     print("---Setting up---")
     # set up device
+    if args.dev == "cuda":
+        assert torch.cuda.is_available(), "CUDA is not available. GPU is required but not accessible."
     device = torch.device(args.dev)
     base_log_dir = Path(args.logdir)
     save_dir = Path(args.savedir)

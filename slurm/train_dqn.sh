@@ -21,13 +21,13 @@ module load cuDNN/9.5.0.50-CUDA-12.6.0
 
 #install packages
 echo "---INSTALLING PACKAGES---"
-pip install --user gymnasium[all] stable-baselines3[extra]
+pip install --user gymnasium[atari] stable-baselines3[extra]
 pip install --user -e "$HOME"/github/pong_rl
 
 #Run very simple script
 echo "---RUNNING PYTHON SCRIPT---"
 python "$HOME"/github/pong_rl/scripts/train.py \
- --dev=gpu \
+ --dev=cuda \
  --logdir="$HOME"/output/pong_rl/tb_logs \
  --savedir="$HOME"/output/pong_rl
 
