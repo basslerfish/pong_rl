@@ -77,7 +77,8 @@ def calculate_loss(
 
     # compute q-values of states
     states.to(device)
-    assert next(net.parameters()).device == states.device, f"{device=}"
+    params_device = next(net.parameters()).device
+    assert params_device == states.device, f"{params_device=}, {states.device=}, {device=}"
     q_values = net(states)  # all actions
     q_values_chosen = q_values.gather(1, actions.unsqueeze(-1))  # only of actions we chose
 

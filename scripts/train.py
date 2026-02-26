@@ -62,6 +62,7 @@ def main() -> None:
         assert torch.cuda.is_available(), "CUDA is not available. GPU is required but not accessible."
         print("CUDA is available.")
     device = torch.device(args.dev)
+    print(f"Running on {device}")
     base_log_dir = Path(args.logdir)
     save_dir = Path(args.savedir)
     assert base_log_dir.is_dir(), f"Log directory {base_log_dir} does not exist"
