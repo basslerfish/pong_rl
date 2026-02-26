@@ -1,23 +1,53 @@
 """
 Use a pre-trained DQN to play pong.
+Requires path to weights file as input argument.
 """
+import argparse
+import time
+from pathlib import Path
+
 import ale_py  # needed to load atari games
 import gymnasium as gym
+import torch
 
 from pong_rl.wrappers import make_env
 from pong_rl.agent import Agent
 from pong_rl.model import DQN
+from pong_rl.data import ExperienceBuffer
 
 
 # params
 ENV_NAME = "PongNoFrameskip-v4"
 
-# load environment
-env = make_env(ENV_NAME)
 
-# load model
-net = DQN()
+def main() -> None:
+    # argument parsing
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--file", help="Path to model weights file.")
+    args = parser.parse_args()
+
+    # load environment
+    env = make_env(ENV_NAME, render_mode="human")
+
+    # instantiate model
+    net = DQN(env.observation_space.shape, env.action_space.n)
+
+    # load weights
+    weights_file = Path(args.file)
+    assert weights_file.is_file(), f"Weights file {weights_file} does not exist."
+    state_dict = torch.load(str(weights_file))
+    net.load_state_dict(state_dict)
+
+    # prep agent
+    buffer = ExperienceBuffer(0)  # we don't need to save experiences now
+    agent = Agent(env, buffer)
+    device = torch.device("cpu")  # small enough to run on cpu
+
+    episode_reward = None
+    while episode_reward is None:
+        episode_reward = agent.play_step(net, device=device, epsilon=0)
+    print(f"Episode completed - reward: {episode_reward:.0f}")
 
 
-
-# play and display
+if __name__ == "__main__":
+    main()

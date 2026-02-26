@@ -32,6 +32,7 @@ class Agent:
             net: DQN,
             device: torch.device,
             epsilon: float = 0.0,
+            render: bool = False,
     ) -> float | None:
         """
         Take a single step in the environment.
@@ -47,6 +48,8 @@ class Agent:
 
         # take step
         new_state, reward, is_done, is_trunc, _ = self.env.step(action)
+        if render:
+            self.env.render()
         self.total_reward += reward
 
         # save transition

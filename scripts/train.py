@@ -1,5 +1,11 @@
 """
 Try to solve the Atari pong game with deep Q-learning.
+Pass the following arguments:
+--dev: device, cpu or gpu
+--logdir: where to save tensorboard logs
+--savedir: where to save model weights.
+
+How it works:
 We use a deep Q network (DQN) to predict state-action values given a state.
 We train the network by calculating the loss between the predicted state-action value
 and the bellman update (update = r + gamma * max(Q(s', a'))
@@ -48,12 +54,13 @@ def main() -> None:
     parser.add_argument("--dev", default="cpu", help="Device name, default=cpu")
     parser.add_argument("--logdir", help="Path to logdir for tensorboard")
     parser.add_argument("--savedir", help="Where to save model weights")
+    args = parser.parse_args()
 
     print("---Setting up---")
     # set up device
-    device = torch.device(parser.dev)
-    base_log_dir = Path(parser.logdir)
-    save_dir = Path(parser.savedir)
+    device = torch.device(args.dev)
+    base_log_dir = Path(args.logdir)
+    save_dir = Path(args.savedir)
     assert base_log_dir.is_dir(), f"Log directory {base_log_dir} does not exist"
     assert save_dir.is_dir(), f"Save directory {save_dir} does not exist"
 
@@ -80,6 +87,7 @@ def main() -> None:
     log_dir = base_log_dir / f"{time.time():.0f}"
     writer = SummaryWriter(log_dir=str(log_dir))
     last_loss = np.nan
+    has_started = False
 
     # training loop
     print("---Training---")
@@ -93,6 +101,9 @@ def main() -> None:
 
         # update weights if we have enough experiences to sample from
         if len(buffer) >= REPLAY_START_SIZE:
+            if not has_started:
+                print("Required number of experiences reached - DQN training starts now.")
+                has_started = True
             optimizer.zero_grad()
             batch = buffer.sample(BATCH_SIZE)  # sample experience buffer
             loss = calculate_loss(  # calculate loss between predicted q vals and bellman update
@@ -126,7 +137,7 @@ def main() -> None:
             # log progress
             current_time = time.time()
             elapsed = current_time - last_time
-            print(f"{frame_idx:,}: {len(total_rewards)} games, {reward:.0f} last reward, {m_reward:.3f} running mean, {elapsed:.3f}s game time")
+            print(f"Frame {frame_idx:,}: {len(total_rewards)} games, {reward:.0f} last reward, {m_reward:.3f} running mean, {elapsed:.3f}s game time")
             writer.add_scalar("epsilon", epsilon, frame_idx)
             writer.add_scalar("games", len(total_rewards), frame_idx)
             writer.add_scalar("buffer_length", len(buffer), frame_idx)
