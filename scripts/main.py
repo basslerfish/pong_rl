@@ -29,18 +29,18 @@ def main() -> None:
     env = make_env(ENV_NAME, render_mode="human")
 
     # instantiate model
+    device = torch.device("cpu")  # small enough to run on cpu
     net = DQN(env.observation_space.shape, env.action_space.n)
 
     # load weights
     weights_file = Path(args.file)
     assert weights_file.is_file(), f"Weights file {weights_file} does not exist."
-    state_dict = torch.load(str(weights_file), map_location=torch.device("cpu"))
+    state_dict = torch.load(str(weights_file), map_location=device)
     net.load_state_dict(state_dict)
 
     # prep agent
     buffer = ExperienceBuffer(0)  # we don't need to save experiences now
     agent = Agent(env, buffer)
-    device = torch.device("cpu")  # small enough to run on cpu
 
     episode_reward = None
     while episode_reward is None:
