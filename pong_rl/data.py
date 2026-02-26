@@ -54,7 +54,7 @@ class ExperienceBuffer:
         return sampled
 
 
-def batch_to_tensors(batch: list[Experience], device: torch.device, verbose: bool = True) -> BatchTensors:
+def batch_to_tensors(batch: list[Experience], device: torch.device) -> BatchTensors:
     """
     Convert a batch of experiences into tensors for training.
     """
@@ -76,11 +76,9 @@ def batch_to_tensors(batch: list[Experience], device: torch.device, verbose: boo
     dones = torch.BoolTensor(dones)
     new_states = torch.as_tensor(np.asarray(new_states))
 
-    if verbose:
-        print(f"Shifting tensors to {device}")
-    all_tensors = (states, actions, rewards, dones, new_states)
-    for tensor in all_tensors:
-        print(f"Before: {tensor.device}")
-        tensor.to(device)
-        print(f"After: {tensor.device}")
+    # convert to device
+    all_tensors = [states, actions, rewards, dones, new_states]
+    for i in range(len(all_tensors)):
+        all_tensors[i] = all_tensors[i].to(device)
+    all_tensors = tuple(all_tensors)
     return all_tensors
