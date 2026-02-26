@@ -42,9 +42,10 @@ def main() -> None:
     buffer = ExperienceBuffer(0)  # we don't need to save experiences now
     agent = Agent(env, buffer)
 
+    # play episode and render
     episode_reward = None
     while episode_reward is None:
-        episode_reward = agent.play_step(net, device=device, epsilon=0)
+        episode_reward = agent.play_step(net, device=device, epsilon=0, render=True)
     print(f"Episode completed - reward: {episode_reward:.0f}")
 
 

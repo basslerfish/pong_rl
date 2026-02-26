@@ -24,7 +24,7 @@ echo "---INSTALLING PACKAGES---"
 pip install --user gymnasium[atari] stable-baselines3[extra]
 pip install --user -e "$HOME"/github/pong_rl
 
-#Run very simple script
+#Run
 echo "---RUNNING PYTHON SCRIPT---"
 python "$HOME"/github/pong_rl/scripts/train.py \
  --dev=cuda \
