@@ -1,5 +1,5 @@
 """
-Agent classs to choose actions in environment.
+Agent class to choose actions in Pong environment.
 """
 import torch
 import gymnasium as gym
@@ -68,7 +68,7 @@ class Agent:
 
     def choose_action(self, net: DQN, device: torch.device) -> int:
         """
-        Feedforward pass through our deep q network.
+        Feedforward pass through our deep Q network.
         Followed by selection of action with highest state-action value.
         """
         state_tensor = torch.as_tensor(self.state)

@@ -1,5 +1,8 @@
 """
 Wrappers for Atari games.
+
+It is a long way from the raw frames of an Atari game to ML-usable input.
+Fortunately, stable_baselines3 handles most of the data preprocessing.
 """
 import collections
 
@@ -36,9 +39,7 @@ class ImageToPyTorch(gym.ObservationWrapper):
 class BufferWrapper(gym.ObservationWrapper):
     """
     Create a frame buffer to stack multiple frames into one state.
-    This way, movement can be extracted (which would not be possible from a single still image).
-
-    This needs to come after all the formatting wrappers.
+    This way, movement information can be extracted (which would not be possible from a single still image).
     """
     def __init__(self, env: gym.Env, n_steps: int) -> None:
         super().__init__(env)
@@ -54,7 +55,7 @@ class BufferWrapper(gym.ObservationWrapper):
 
     def observation(self, observation: np.ndarray) -> np.ndarray:
         """
-        Return stack of frames instead of frame.
+        Return stack of frames in buffer (instead of a single frame).
         """
         self.buffer.append(observation)
         out = np.concatenate(self.buffer)
@@ -65,8 +66,7 @@ class BufferWrapper(gym.ObservationWrapper):
             seed: int | None = None,
             options: dict | None = None,
     ) -> tuple:
-        # don't really get this part
-        # you fill the buffer, but with what?
+        """When resetting, fill the buffer with empty frames."""
         for _ in range(self.buffer.maxlen - 1):
             self.buffer.append(self.env.observation_space.low)
         obs, extra = self.env.reset()

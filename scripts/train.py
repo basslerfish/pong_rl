@@ -11,6 +11,7 @@ Requirements for smooth learning (see Deepmind RL papers from 2013/2015).
 4. We keep a copy of our DQN that remains unchanged to predict Q(s', a') so that it is not affected by our weight updates.
     - This copy (target network) gets the newest weight only every x frames (where x is a large number)
 """
+import argparse
 import time
 from pathlib import Path
 
@@ -27,27 +28,34 @@ from pong_rl.agent import Agent
 
 # params
 ENV_NAME = "PongNoFrameskip-v4"
-OUTPUT_DIR = Path("/Users/mathis/Code/private_projects/learn_rl/results/lapan2024/q_learning")
-LOG_DIR = Path("/Users/mathis/Code/private_projects/learn_rl/results/tb_runs/q_pong")
 REWARD_LIMIT = 19  # we stop learning once model is that good
 GAMMA = 0.99  # discount factor
-BATCH_SIZE = 32
-REPLAY_SIZE = 10_000  # buffer of transitions to learn from
-LEARNING_RATE = 10 ** -4
+BATCH_SIZE = 32  # experiences to learn from per training step
+REPLAY_SIZE = 10_000  # buffer size of transitions to learn from (should be large)
+LEARNING_RATE = 10 ** -4  # learning rate of Adam optimizer
 SYNC_TARGET_FRAMES = 1_000  # how often to update the target network
-REPLAY_START_SIZE = 10_000  # wait for experience before starting to learn
+REPLAY_START_SIZE = 10_000  # wait for this many experiences before starting to learn
 
-EPSILON_DECAY_FRAMES = 150_000
+# epsilon-greedy parameters
+EPSILON_DECAY_FRAMES = 150_000  # decay epsilon-greedy over this many frames
 EPSILON_START = 1.0  # start with 100% chance of random action
 EPSILON_END = 0.01  # end with almost no chance of random action
 
-DEVICE = "cpu"
-
 
 def main() -> None:
+    # argument parsing
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dev", default="cpu", help="Device name, default=cpu")
+    parser.add_argument("--logdir", help="Path to logdir for tensorboard")
+    parser.add_argument("--savedir", help="Where to save model weights")
+
     print("---Setting up---")
     # set up device
-    device = torch.device(DEVICE)
+    device = torch.device(parser.dev)
+    base_log_dir = Path(parser.logdir)
+    save_dir = Path(parser.savedir)
+    assert base_log_dir.is_dir(), f"Log directory {base_log_dir} does not exist"
+    assert save_dir.is_dir(), f"Save directory {save_dir} does not exist"
 
     # make environment
     env = make_env(ENV_NAME)
@@ -69,7 +77,7 @@ def main() -> None:
     best_m_reward = None
     frame_idx = 0
     last_time = time.time()
-    log_dir = LOG_DIR / f"{time.time():.0f}"
+    log_dir = base_log_dir / f"{time.time():.0f}"
     writer = SummaryWriter(log_dir=str(log_dir))
     last_loss = np.nan
 
@@ -106,7 +114,7 @@ def main() -> None:
 
             # save model
             if (best_m_reward is None) or (m_reward > best_m_reward):
-                save_path = OUTPUT_DIR / f"best_{m_reward:.0f}.dat"
+                save_path = save_dir / f"best_{m_reward:.0f}.dat"
                 torch.save(net.state_dict(), str(save_path))
                 best_m_reward = m_reward
 
@@ -138,5 +146,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-
