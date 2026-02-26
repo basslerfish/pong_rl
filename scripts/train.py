@@ -60,6 +60,7 @@ def main() -> None:
     # set up device
     if args.dev == "cuda":
         assert torch.cuda.is_available(), "CUDA is not available. GPU is required but not accessible."
+        print("CUDA is available.")
     device = torch.device(args.dev)
     base_log_dir = Path(args.logdir)
     save_dir = Path(args.savedir)
@@ -73,6 +74,8 @@ def main() -> None:
     # make q models (CNNs that predict state-action values)
     net = DQN(env.observation_space.shape, env.action_space.n)
     tgt_net = DQN(env.observation_space.shape, env.action_space.n)
+    net.to(device)
+    tgt_net.to(device)
     optimizer = optim.Adam(net.parameters(), lr=LEARNING_RATE)
     n_params = np.sum([p.numel() for p in net.parameters()])
     print(f"Parameters in network: {n_params:,.0f}")
