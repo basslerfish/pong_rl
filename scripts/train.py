@@ -22,6 +22,7 @@ import time
 from pathlib import Path
 
 import ale_py  # to import atari games
+import pandas as pd
 import torch
 import numpy as np
 from torch import optim
@@ -41,6 +42,7 @@ REPLAY_SIZE = 10_000  # buffer size of transitions to learn from (should be larg
 LEARNING_RATE = 10 ** -4  # learning rate of Adam optimizer
 SYNC_TARGET_FRAMES = 1_000  # how often to update the target network
 REPLAY_START_SIZE = 10_000  # wait for this many experiences before starting to learn
+ALSO_CSV = True  # whether to save csv table of progress besides tensorboard
 
 # epsilon-greedy parameters
 EPSILON_DECAY_FRAMES = 150_000  # decay epsilon-greedy over this many frames
@@ -95,6 +97,9 @@ def main() -> None:
     writer = SummaryWriter(log_dir=str(log_dir))
     last_loss = np.nan
     has_started = False
+    if ALSO_CSV:
+        csv_file = log_dir / "log.csv"
+        first_write = True
 
     # training loop
     print("---Training---")
@@ -153,6 +158,25 @@ def main() -> None:
             writer.add_scalar("elapsed", elapsed, frame_idx)
             writer.add_scalar("running_mean_reward", m_reward, frame_idx)
             writer.add_scalar("last_loss", last_loss, frame_idx)
+
+            if ALSO_CSV:
+                entry = {
+                    "i_frame": frame_idx,
+                    "epsilon": epsilon,
+                    "games": len(total_rewards),
+                    "buffer_length": len(buffer),
+                    "last_loss": last_loss,
+                    "elapsed": elapsed,
+                    "running_mean_reward": m_reward,
+                    "reward": reward,
+                }
+                entry = pd.DataFrame([entry])
+                if first_write:
+                    entry.to_csv(csv_file)
+                    first_write = False
+                else:
+                    entry.to_csv(csv_file, header=False, mode="a")
+
             last_time = current_time
 
         # give tgt network latest weights
