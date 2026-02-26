@@ -132,7 +132,7 @@ def main() -> None:
 
             # save model
             if (best_m_reward is None) or (m_reward > best_m_reward):
-                print(f"New best reward: {best_m_reward:.3f}")
+                print(f"New best reward: {m_reward:.3f}")
                 save_path = save_dir / f"best_{m_reward:.0f}.dat"
                 torch.save(net.state_dict(), str(save_path))
                 best_m_reward = m_reward
