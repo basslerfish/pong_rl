@@ -7,6 +7,7 @@ from dataclasses import dataclass
 import numpy as np
 import torch
 
+
 # type declarations
 State = np.ndarray
 Action = int
@@ -43,9 +44,11 @@ class ExperienceBuffer:
         return len(self.buffer)
 
     def append(self, experience: Experience) -> None:
+        """Add an experience the buffer."""
         self.buffer.append(experience)
 
     def sample(self, batch_size: int) -> list[Experience]:
+        """Randomly sample experiences from the buffer."""
         indices = np.random.choice(len(self), batch_size, replace=False)
         sampled = [self.buffer[i] for i in indices]
         return sampled

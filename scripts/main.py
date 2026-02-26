@@ -3,11 +3,9 @@ Use a pre-trained DQN to play pong.
 Requires path to weights file as input argument.
 """
 import argparse
-import time
 from pathlib import Path
 
 import ale_py  # needed to load atari games
-import gymnasium as gym
 import torch
 
 from pong_rl.wrappers import make_env
