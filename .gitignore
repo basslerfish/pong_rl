@@ -4,3 +4,4 @@
 tb_logs/
 data/hidden/
 *.egg-info/
+images/*.svg

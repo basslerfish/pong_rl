@@ -7,3 +7,5 @@ How to run:
 - Run `scripts/main.py` to see the model in action
 
 Based on the Deep Reinforcement Learning Handbook (v3) by Maxim Lapan (https://github.com/PacktPublishing/Deep-Reinforcement-Learning-Hands-On-Third-Edition).
+
+<img src="images/description.png" alt="Screenshot of Pong environment" width="400"/>
